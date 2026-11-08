@@ -85,6 +85,7 @@ td.action-cell{display:flex;gap:6px}
     <div class="actions">
       <input id="partnerUrl" style="flex:1;min-width:250px" type="url" placeholder="https://CLASSMATE-APP.onrender.com/api/students">
       <button type="button" id="loadPartnerButton">Retrieve Partner Records</button>
+      <button type="button" class="secondary" id="shareButton" onclick="shareMyApi()">Share My API URL</button>
     </div>
     <p id="partnerStatus" class="status" role="status">Partner records have not been loaded yet.</p>
     <div class="table-wrap"><table>
@@ -260,6 +261,28 @@ $('sendButton').addEventListener('click',async()=>{
   }catch(e){setStatus('sendStatus','Error: '+e.message);}
 }
 );
+
+// SHARE MY API URL: system share sheet on phones, clipboard elsewhere.
+async function shareMyApi() {
+    const url = location.origin + '/api/students';
+    const button = document.getElementById('shareButton');
+    const label = button.textContent;
+
+    try {
+        if (navigator.share && /Mobi|Android/i.test(navigator.userAgent)) {
+            await navigator.share({title: 'My Student API', url: url});
+        } else {
+            await navigator.clipboard.writeText(url);
+        }
+        button.textContent = 'Copied!';
+        setTimeout(() => { button.textContent = label; }, 2000);
+        setStatus('partnerStatus', 'Your API URL: ' + url);
+    } catch (error) {
+        if (error.name === 'AbortError') return;   // user closed the share sheet
+        window.prompt('Copy your API URL:', url);   // clipboard blocked: copy by hand
+    }
+}
+
 loadStudents();
 
 // Auto-refresh every 10 s (and when the tab is shown again) so records received
