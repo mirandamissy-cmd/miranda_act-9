@@ -97,10 +97,11 @@ td.empty{display:block;text-align:center}
     <h2>Partner Records</h2>
     <p class="sub">Enter your assigned classmate's public Render API URL. Only exchange fictional practice data and coordinate with your partner first.</p>
     <div class="actions">
-      <input id="partnerUrl" style="flex:1;min-width:250px" type="url" placeholder="https://jero-act-9.onrender.com/api/students">
+      <input id="partnerUrl" style="flex:1;min-width:250px" type="url" placeholder="https://maria-santos.onrender.com/api/students">
       <button type="button" id="loadPartnerButton">Retrieve Partner Records</button>
       <button type="button" class="secondary" id="shareButton" onclick="shareMyApi()">Share My API URL</button>
     </div>
+    <p class="sub" style="margin:2px 0 0;font-size:13px;overflow-wrap:anywhere">Examples: https://maria-santos.onrender.com/api/students &nbsp;·&nbsp; https://juan-delacruz.onrender.com/api/students &nbsp;·&nbsp; https://pedro-reyes.onrender.com/api/students</p>
     <p id="partnerStatus" class="status" role="status">Partner records have not been loaded yet.</p>
     <div class="table-wrap"><table>
       <thead><tr><th>Partner DB ID</th><th>Student ID</th><th>Name</th><th>Program</th><th>Year</th><th>Section</th><th>Action</th></tr></thead>
