@@ -4,6 +4,7 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 
+import requests
 from flask import Flask, jsonify, request, render_template
 
 app = Flask(__name__)
