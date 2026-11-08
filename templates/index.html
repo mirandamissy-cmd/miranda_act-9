@@ -30,7 +30,6 @@ td.action-cell{display:flex;gap:6px}
 .local{background:#e0f2fe;color:#075985}.imported{background:#dcfce7;color:#166534}.external{background:#fef3c7;color:#92400e}
 .empty{color:#64748b;text-align:center;padding:18px}
 /* record detail card (View) */.dc { border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }.dc-head { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }.dc-avatar { width: 52px; height: 52px; border-radius: 50%; background: #245ca6; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; flex: none; }.dc-title { flex: 1 1 180px; min-width: 0; }.dc-title strong { display: block; font-size: 18px; overflow-wrap: anywhere; }.dc-title small { color: #6b7280; }.dc-close { background: #e8ecf3; color: #243b64; border: none; border-radius: 8px; padding: 6px 12px; margin: 0; cursor: pointer; font-size: 13px; }.dc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-top: 14px; }.dc-field { background: #f6f8fb; border-radius: 8px; padding: 10px 12px; }.dc-label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: #6b7280; }.dc-value { display: block; font-weight: 600; margin-top: 2px; overflow-wrap: anywhere; }#partnerDetails{margin-top:14px}
-.chips{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:12px 0 4px;font-size:13px;color:#6b7280}.chip{background:#eef2f7;color:#173b70;border:1px solid #d5dce8;border-radius:999px;padding:6px 12px;margin:0;cursor:pointer;font-size:13px}.chip:hover{background:#e0e8f4}
 
 .modal-overlay { position: fixed; inset: 0; background: rgba(17,24,39,0.5); display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 1000; }.modal { background: #fff; border-radius: 14px; max-width: 420px; width: 100%; padding: 22px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); }.modal h3 { margin: 0 0 6px; font-size: 18px; color: #1f2937; }.modal p { margin: 0 0 18px; color: #4b5563; font-size: 14px; line-height: 1.5; }.modal-actions { display: flex; justify-content: flex-end; gap: 8px; }.modal-actions button { margin: 0; padding: 9px 16px; border: none; border-radius: 8px; font-size: 14px; cursor: pointer; }.modal-cancel { background: #e8ecf3; color: #243b64; }.modal-ok { background: #315b96; color: #fff; }.modal-ok.danger { background: #c0392b; }.sr { border: 1px solid #bbf7d0; background: #f0fdf4; border-radius: 12px; padding: 16px; margin-top: 12px; }.sr-head { display: flex; gap: 12px; align-items: center; }.sr-icon { width: 36px; height: 36px; border-radius: 50%; background: #16a34a; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; flex: none; }.sr-title strong { display: block; color: #14532d; }.sr-title small { color: #4b5563; }.sr-note { margin: 10px 0 0; color: #166534; font-size: 14px; }.send-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
 
@@ -115,19 +114,12 @@ td.empty{display:block;text-align:center}
     <h2>Send a Practice Record to Partner</h2>
     <p class="sub">This sends one fictional record to your partner's POST /api/students endpoint. Confirm the URL with your assigned partner before sending.</p>
     <div class="form-grid">
-      <input id="send_id" placeholder="EXT-001">
-      <input id="send_name" placeholder="Rico Dela Vega">
-      <input id="send_program" placeholder="BSIT">
-      <input id="send_year" type="number" min="1" max="6" placeholder="1">
-      <input id="send_section" placeholder="A">
+      <input id="send_id" placeholder="EXT-002">
+      <input id="send_name" placeholder="Maria Santos">
+      <input id="send_program" placeholder="BSCS">
+      <input id="send_year" type="number" min="1" max="6" placeholder="2">
+      <input id="send_section" placeholder="B">
     </div>
-    <div class="chips">
-        <span>Use a fake student:</span>
-        <button type="button" class="chip" onclick="fillSample(0)">Rico Dela Vega</button>
-        <button type="button" class="chip" onclick="fillSample(1)">Maria Santos</button>
-        <button type="button" class="chip" onclick="fillSample(2)">Pedro Reyes</button>
-    </div>
-
     <div class="actions"><button class="green" id="sendButton" type="button">Send Record to Partner API</button></div>
     <p id="sendStatus" class="status" role="status">No record sent yet.</p>
     <div id="sendResult"></div>
@@ -319,22 +311,6 @@ async function importPartnerRecord(s){
     await loadStudents();
   }catch(e){setStatus('partnerStatus','Error: '+e.message);}
 }
-// Three fake students for the send form (placeholders show the first one).
-const SAMPLE_STUDENTS = [
-    {student_id: 'EXT-001', name: 'Rico Dela Vega', program: 'BSIT', year: 1, section: 'A'},
-    {student_id: 'EXT-002', name: 'Maria Santos', program: 'BSCS', year: 2, section: 'B'},
-    {student_id: 'EXT-003', name: 'Pedro Reyes', program: 'BSIT', year: 3, section: 'C'}
-];
-
-function fillSample(index) {
-    const sample = SAMPLE_STUDENTS[index];
-    document.getElementById('send_id').value = sample.student_id;
-    document.getElementById('send_name').value = sample.name;
-    document.getElementById('send_program').value = sample.program;
-    document.getElementById('send_year').value = sample.year;
-    document.getElementById('send_section').value = sample.section;
-}
-
 function confirmDialog(title, text, okLabel, danger) {
     return new Promise(resolve => {
         const el = (tag, cls, content) => {
