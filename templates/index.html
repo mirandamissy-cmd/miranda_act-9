@@ -50,7 +50,7 @@ td.action-cell{display:flex;gap:6px}
       <div class="metric">Imported Records<strong id="importedCount">0</strong></div>
       <div class="metric">Partner Records Loaded<strong id="partnerCount">0</strong></div>
     </div>
-    <p class="sub">The Source column identifies whether a record is Local, Classmate API, or an external/partner API.</p>
+    <p class="sub" style="margin-top:16px">The Source column identifies whether a record is Local, Classmate API, or an external/partner API.</p>
   </section>
 
   <section class="panel">
@@ -170,7 +170,7 @@ async function loadStudents(){
 }
 function formData(){
   return {student_id:$('student_id').value.trim(),name:$('name').value.trim(),
-    program:$('program').value.trim(),year:Number($('year').value),section:$('section').value.trim()};
+    program:$('program').value.trim(),year:Number($('year').value),section:$('section').value.trim(),source:'Local'};
 }
 $('studentForm').addEventListener('submit',async e=>{
   e.preventDefault(); const data=formData();
@@ -261,6 +261,15 @@ $('sendButton').addEventListener('click',async()=>{
 }
 );
 loadStudents();
+
+// Auto-refresh every 10 s (and when the tab is shown again) so records received
+// from a partner appear without a manual refresh. Skipped while filtering or editing.
+async function silentRefresh(){
+  if(document.hidden||editingId!==null||$('filterSection').value.trim())return;
+  try{const r=await fetch('/api/students');if(r.ok)renderMyStudents(await r.json());}catch(e){}
+}
+setInterval(silentRefresh,10000);
+document.addEventListener('visibilitychange',silentRefresh);
 </script>
 </body>
 </html>
