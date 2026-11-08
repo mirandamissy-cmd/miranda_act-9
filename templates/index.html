@@ -29,6 +29,7 @@ td.action-cell{display:flex;gap:6px}
 .badge{display:inline-block;background:#eaf1fb;color:#173b70;border-radius:20px;padding:5px 10px;font-size:12px;font-weight:bold}
 .local{background:#e0f2fe;color:#075985}.imported{background:#dcfce7;color:#166534}.external{background:#fef3c7;color:#92400e}
 .empty{color:#64748b;text-align:center;padding:18px}
+/* record detail card (View) */.dc { border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }.dc-head { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }.dc-avatar { width: 52px; height: 52px; border-radius: 50%; background: #245ca6; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; flex: none; }.dc-title { flex: 1 1 180px; min-width: 0; }.dc-title strong { display: block; font-size: 18px; overflow-wrap: anywhere; }.dc-title small { color: #6b7280; }.dc-close { background: #e8ecf3; color: #243b64; border: none; border-radius: 8px; padding: 6px 12px; margin: 0; cursor: pointer; font-size: 13px; }.dc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-top: 14px; }.dc-field { background: #f6f8fb; border-radius: 8px; padding: 10px 12px; }.dc-label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: #6b7280; }.dc-value { display: block; font-weight: 600; margin-top: 2px; overflow-wrap: anywhere; }#partnerDetails{margin-top:14px}
 .dashboard{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 .metric{background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:16px}
 .metric strong{display:block;font-size:25px;color:#173b70;margin-top:5px}
@@ -92,6 +93,7 @@ td.action-cell{display:flex;gap:6px}
       <thead><tr><th>Partner DB ID</th><th>Student ID</th><th>Name</th><th>Program</th><th>Year</th><th>Section</th><th>Action</th></tr></thead>
       <tbody id="partnerList"><tr><td colspan="7" class="empty">Enter your partner's API URL and retrieve records.</td></tr></tbody>
     </table></div>
+    <div id="partnerDetails"></div>
   </section>
 
   <section class="panel">
@@ -208,6 +210,52 @@ $('loadSectionButton').addEventListener('click',()=>{
   setStatus('status','Filtered by section '+section+'. Click Refresh My Records to show all records.');
 });
 
+function detailCard(student, onClose) {
+    const el = (tag, cls, text) => {
+        const node = document.createElement(tag);
+        if (cls) node.className = cls;
+        if (text !== undefined) node.textContent = text;
+        return node;
+    };
+
+    const initials = String(student.name || '?').trim().split(/\s+/)
+        .slice(0, 2).map(word => word[0]).join('').toUpperCase();
+
+    const title = el('div', 'dc-title');
+    title.append(
+        el('strong', '', student.name || 'N/A'),
+        el('small', '', 'Student ID: ' + (student.student_id ?? 'N/A'))
+    );
+
+    const close = el('button', 'dc-close', 'Close');
+    close.type = 'button';
+    close.onclick = onClose;
+
+    const head = el('div', 'dc-head');
+    head.append(el('div', 'dc-avatar', initials), title, sourceBadge(student.source), close);
+
+    const grid = el('div', 'dc-grid');
+    [
+        ['Program', student.program],
+        ['Year', student.year],
+        ['Section', student.section],
+        ['Database ID', student.id]
+    ].forEach(([label, value]) => {
+        const field = el('div', 'dc-field');
+        field.append(el('span', 'dc-label', label), el('span', 'dc-value', value ?? 'N/A'));
+        grid.appendChild(field);
+    });
+
+    const card = el('div', 'dc');
+    card.append(head, grid);
+    return card;
+}
+function showPartnerDetails(s){
+  const box=$('partnerDetails');
+  box.replaceChildren(detailCard(s,()=>box.replaceChildren()));
+  box.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
 function renderPartnerRecords(students){
   partnerStudents=students; $('partnerList').replaceChildren();
   $('partnerCount').textContent=students.length;
@@ -216,10 +264,7 @@ function renderPartnerRecords(students){
     const tr=document.createElement('tr');
     [s.id,s.student_id,s.name,s.program,s.year,s.section].forEach(v=>cell(tr,v));
     const td=document.createElement('td');td.className='action-cell';
-    td.append(actionButton('View',()=>alert(
-      'Partner record details\\nStudent ID: '+(s.student_id||'')+'\\nName: '+(s.name||'')+
-      '\\nProgram: '+(s.program||'')+'\\nYear: '+(s.year||'')+'\\nSection: '+(s.section||'')
-    )));
+    td.append(actionButton('View',()=>showPartnerDetails(s)));
     td.append(actionButton('Save to My Database',()=>importPartnerRecord(s),'small green'));
     tr.appendChild(td);$('partnerList').appendChild(tr);
   });
