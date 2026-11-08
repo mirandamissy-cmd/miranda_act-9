@@ -38,6 +38,17 @@ td.action-cell{display:flex;gap:6px}
 .links{display:flex;flex-wrap:wrap;gap:12px}a{color:#245ca6;overflow-wrap:anywhere}
 @media(max-width:800px){.form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.dashboard{grid-template-columns:1fr}}
 @media(max-width:500px){header h1{font-size:21px}.panel{padding:16px}.form-grid{grid-template-columns:1fr}}
+@media(max-width:900px){
+input,button{font-size:16px}button{min-height:44px}button.small{min-height:40px;font-size:14px}
+table,thead,tbody,tr,td{display:block}thead{display:none}
+tr{border:1px solid #e2e8f0;border-radius:10px;margin:10px 0;padding:6px 10px}
+td{border:0;padding:6px 0;white-space:normal;display:flex;justify-content:space-between;gap:10px;text-align:right;overflow-wrap:anywhere}
+td[data-label]::before{content:attr(data-label);font-weight:bold;color:#173b70;text-align:left;flex:none}
+td.action-cell{justify-content:flex-start;flex-wrap:wrap;text-align:left}
+td.empty{display:block;text-align:center}
+.links a{display:inline-block;padding:10px 0}
+}
+@media(pointer:coarse){input{font-size:16px}button{min-height:44px}.links a{display:inline-block;padding:10px 0}}
 </style>
 </head>
 <body>
@@ -86,7 +97,7 @@ td.action-cell{display:flex;gap:6px}
     <h2>Partner Records</h2>
     <p class="sub">Enter your assigned classmate's public Render API URL. Only exchange fictional practice data and coordinate with your partner first.</p>
     <div class="actions">
-      <input id="partnerUrl" style="flex:1;min-width:250px" type="url" placeholder="https://CLASSMATE-APP.onrender.com/api/students">
+      <input id="partnerUrl" style="flex:1;min-width:250px" type="url" placeholder="https://jero-act-9.onrender.com/api/students">
       <button type="button" id="loadPartnerButton">Retrieve Partner Records</button>
       <button type="button" class="secondary" id="shareButton" onclick="shareMyApi()">Share My API URL</button>
     </div>
@@ -148,6 +159,12 @@ function actionButton(label, handler, className='small'){
   b.addEventListener('click', handler);
   return b;
 }
+function labelCells(tbodyId){
+  const body=$(tbodyId), heads=[...body.closest('table').querySelectorAll('thead th')].map(t=>t.textContent);
+  body.querySelectorAll('tr').forEach(tr=>[...tr.children].forEach((td,i)=>{
+    if(heads[i]&&!td.classList.contains('empty')&&!td.classList.contains('action-cell'))td.dataset.label=heads[i];
+  }));
+}
 function renderMyStudents(students){
   cachedStudents = students;
   $('studentList').replaceChildren();
@@ -163,6 +180,7 @@ function renderMyStudents(students){
     actions.append(actionButton('Edit',()=>startEdit(s)),actionButton('Delete',()=>deleteStudent(s.id,s.name),'small danger'));
     tr.appendChild(actions); $('studentList').appendChild(tr);
   });
+  labelCells('studentList');
   $('localCount').textContent=students.filter(s=>(s.source||'Local')==='Local').length;
   $('importedCount').textContent=students.filter(s=>(s.source||'Local')!=='Local').length;
 }
@@ -271,6 +289,7 @@ function renderPartnerRecords(students){
     td.append(actionButton('Save to My Database',()=>importPartnerRecord(s),'small green'));
     tr.appendChild(td);$('partnerList').appendChild(tr);
   });
+  labelCells('partnerList');
 }
 $('loadPartnerButton').addEventListener('click',async()=>{
   const url=$('partnerUrl').value.trim();
